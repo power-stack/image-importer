@@ -7,6 +7,9 @@ import uuid
 import base64
 from subprocess import call
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 # input comes from STDIN
 for line in sys.stdin:
     # remove leading and trailing whitespace
