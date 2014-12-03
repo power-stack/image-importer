@@ -4,16 +4,6 @@ image-importer
 100 pics    28s
 ===============
 ```
-hadoop jar /usr/share/hadoop/contrib/streaming/hadoop-streaming-1.2.1.jar -input /user/eloancn/ -output /user/output1 -mapper mapper.py -reducer reducer.py -file /tmp/reducer.py -file /tmp/mapper.py
-packageJobJar: [/tmp/reducer.py, /tmp/mapper.py, /tmp/hadoop-hadoop/hadoop-unjar4473518186932958303/] [] /tmp/streamjob1401338980956478467.jar tmpDir=null
-14/12/02 13:54:11 INFO util.NativeCodeLoader: Loaded the native-hadoop library
-14/12/02 13:54:11 WARN snappy.LoadSnappy: Snappy native library not loaded
-14/12/02 13:54:11 INFO mapred.FileInputFormat: Total input paths to process : 2
-14/12/02 13:54:11 INFO streaming.StreamJob: getLocalDirs(): [/mnt/lib/hadoop/mapred]
-14/12/02 13:54:11 INFO streaming.StreamJob: Running job: job_201411190650_0009
-14/12/02 13:54:11 INFO streaming.StreamJob: To kill this job, run:
-14/12/02 13:54:11 INFO streaming.StreamJob: /usr/libexec/../bin/hadoop job  -Dmapred.job.tracker=TenNode-master-tmpl-001:8021 -kill job_201411190650_0009
-14/12/02 13:54:11 INFO streaming.StreamJob: Tracking URL: http://TenNode-master-tmpl-001.novalocal:50030/jobdetails.jsp?jobid=job_201411190650_0009
 14/12/02 13:54:12 INFO streaming.StreamJob:  map 0%  reduce 0%
 14/12/02 13:54:20 INFO streaming.StreamJob:  map 31%  reduce 0%
 14/12/02 13:54:21 INFO streaming.StreamJob:  map 63%  reduce 0%
@@ -32,6 +22,7 @@ packageJobJar: [/tmp/reducer.py, /tmp/mapper.py, /tmp/hadoop-hadoop/hadoop-unjar
 
 1000 pics    42s
 ================
+```
 14/12/03 02:45:00 INFO streaming.StreamJob:  map 0%  reduce 0%
 14/12/03 02:45:08 INFO streaming.StreamJob:  map 5%  reduce 0%
 14/12/03 02:45:09 INFO streaming.StreamJob:  map 14%  reduce 0%
@@ -56,9 +47,11 @@ packageJobJar: [/tmp/reducer.py, /tmp/mapper.py, /tmp/hadoop-hadoop/hadoop-unjar
 14/12/03 02:45:40 INFO streaming.StreamJob:  map 100%  reduce 100%
 14/12/03 02:45:42 INFO streaming.StreamJob: Job complete: job_201411190650_0010
 14/12/03 02:45:42 INFO streaming.StreamJob: Output: /user/output1000
+```
 
 5000 pics   139s
 ================
+```
 14/12/03 02:53:51 INFO streaming.StreamJob:  map 0%  reduce 0%
 14/12/03 02:54:00 INFO streaming.StreamJob:  map 2%  reduce 0%
 14/12/03 02:54:03 INFO streaming.StreamJob:  map 3%  reduce 0%
@@ -143,10 +136,11 @@ packageJobJar: [/tmp/reducer.py, /tmp/mapper.py, /tmp/hadoop-hadoop/hadoop-unjar
 14/12/03 02:56:08 INFO streaming.StreamJob:  map 100%  reduce 100%
 14/12/03 02:56:10 INFO streaming.StreamJob: Job complete: job_201411190650_0011
 14/12/03 02:56:10 INFO streaming.StreamJob: Output: /user/output5000
-
+```
 
 10000 pics    263s
 ===========================
+```
 14/12/03 03:19:04 INFO streaming.StreamJob:  map 0%  reduce 0%
 14/12/03 03:19:14 INFO streaming.StreamJob:  map 1%  reduce 0%
 14/12/03 03:19:17 INFO streaming.StreamJob:  map 2%  reduce 0%
@@ -263,8 +257,16 @@ packageJobJar: [/tmp/reducer.py, /tmp/mapper.py, /tmp/hadoop-hadoop/hadoop-unjar
 14/12/03 03:23:26 INFO streaming.StreamJob:  map 100%  reduce 100%
 14/12/03 03:23:27 INFO streaming.StreamJob: Job complete: job_201411190650_0012
 14/12/03 03:23:27 INFO streaming.StreamJob: Output: /user/output10000
-
+```
 
 generate data
 =====================
+```
 for i in {101..200}; do echo "copy $i"; hadoop fs -copyFromLocal liushui_01.json /user/eloancn/liushui_$i.json; done
+```
+
+submit job
+===============
+```
+hadoop jar /usr/share/hadoop/contrib/streaming/hadoop-streaming-1.2.1.jar -input /user/eloancn/ -output /user/output1 -mapper mapper.py -reducer reducer.py -file /tmp/reducer.py -file /tmp/mapper.py
+```
