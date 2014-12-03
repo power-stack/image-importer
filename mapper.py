@@ -35,9 +35,13 @@ for line in sys.stdin:
                     for k, v in exif_data.items():
                         if k in ExifTags.TAGS:
                             if "MakerNote" != ExifTags.TAGS.get(k):
-                                if v and "photoshop" in str(v).lower():
+                                if v and ("photoshop" in str(v).lower() or "microsoft" in str(v).lower()):
                                     print "%s=100" % img_name
                                     photoshopped = True
+                bands = im.getbands()
+                if bands and bands != ('R', 'G', 'B'):
+                    print "%s=100" % img_name
+                    photoshopped = True
             except:
                 pass
             if not photoshopped:
