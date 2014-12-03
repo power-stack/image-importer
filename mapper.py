@@ -30,6 +30,16 @@ for line in sys.stdin:
             im = Image.open(filename)
             photoshopped = False
             try:
+                im_info = im.info
+                if im_info and ("jfif" in im_info or "jfif_unit" in im_info):
+                    print "%s=100" % img_name
+                    photoshopped = True
+                    continue
+                bands = im.getbands()
+                if bands and bands != ('R', 'G', 'B'):
+                    print "%s=100" % img_name
+                    photoshopped = True
+                    continue
                 exif_data = im._getexif()
                 if exif_data:
                     for k, v in exif_data.items():
@@ -38,10 +48,6 @@ for line in sys.stdin:
                                 if v and ("photoshop" in str(v).lower() or "microsoft" in str(v).lower()):
                                     print "%s=100" % img_name
                                     photoshopped = True
-                bands = im.getbands()
-                if bands and bands != ('R', 'G', 'B'):
-                    print "%s=100" % img_name
-                    photoshopped = True
             except:
                 pass
             if not photoshopped:
