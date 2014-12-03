@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from PIL import Image, ImageChops, ImageEnhance
+from PIL import Image, ImageChops, ImageEnhance, ExifTags
 import sys, os.path
 import json
 import uuid
@@ -28,17 +28,23 @@ for line in sys.stdin:
             f.flush()
             f.close()
             im = Image.open(filename)
-
-            im.save(resaved, 'JPEG', quality=95)
-            resaved_im = Image.open(resaved)
-
-            ela_im = ImageChops.difference(im, resaved_im)
-            extrema = ela_im.getextrema()
-            max_diff = max([ex[1] for ex in extrema])
-            scale = 255.0/max_diff
-
-            ela_im = ImageEnhance.Brightness(ela_im).enhance(scale)
-
-            print "%s=%d" % (img_name, max_diff)
-            #ela_im.save(ela)
-            call(["rm", "-f", "%s*" % filename])
+            photoshopped = False
+            try:
+                exif_data = im._getexif()
+                if exif_data:
+                    for k, v in exif_data.items():
+                        if k in ExifTags.TAGS:
+                            if "MakerNote" != ExifTags.TAGS.get(k):
+                                if v and "photoshop" in str(v).lower():
+                                    print "%s=100" % img_name
+                                    photoshopped = True
+            except:
+                pass
+            if not photoshopped:
+                im.save(resaved, 'JPEG', quality=95)
+                resaved_im = Image.open(resaved)
+                ela_im = ImageChops.difference(im, resaved_im)
+                extrema = ela_im.getextrema()
+                max_diff = max([ex[1] for ex in extrema])
+                print "%s=%d" % (img_name, max_diff)
+            call(["rm", "-f", "/tmp/%s*" % filename, "&"])
