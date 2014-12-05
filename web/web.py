@@ -4,6 +4,8 @@ import random
 import string
 import cherrypy
 import imagechecking as ic
+import hadoop_job as hjob
+
 
 class SimpleWeb(object):
     @cherrypy.expose
@@ -19,7 +21,17 @@ if __name__ == '__main__':
         '/imagechecking': {
             'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
             'tools.response_headers.on': True,
-            'tools.response_headers.headers': [('Content-Type', 'text/plain')],
+            'tools.response_headers.headers': [('Content-Type', 'text/html')],
+        },
+        '/logreader': {
+            'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+            'tools.response_headers.on': True,
+            'tools.response_headers.headers': [('Content-Type', 'text/html')],
+        },
+        '/resultreader': {
+            'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+            'tools.response_headers.on': True,
+            'tools.response_headers.headers': [('Content-Type', 'text/html')],
         },
         '/static': {
             'tools.staticdir.on': True,
@@ -30,5 +42,8 @@ if __name__ == '__main__':
                             'server.socket_port': 8080,
                            })
     webapp = SimpleWeb()
-    webapp.imagechecking = ic.ImageChecking()
+    hj = hjob.HadoopJob()
+    webapp.imagechecking = ic.ImageChecking(hj)
+    webapp.logreader = ic.LogReader(hj)
+    webapp.resultreader = ic.ResultReader(hj)
     cherrypy.quickstart(webapp, '/', conf)
