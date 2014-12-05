@@ -196,7 +196,7 @@ class ImageChecking(object):
             if os.path.exists("./hjob.log"):
                 os.remove("./hjob.log")
             self._hjob.start(picdirs, "./hjob.log")
-            content += "<h1>启动成功</h1>"
+            content += "<h2>启动成功</h2>"
         content += "</div>"
         return htmltpl.replace("$$TOREPLACE$$", content)
 
