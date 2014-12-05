@@ -8,22 +8,27 @@ import time
 from threading import Thread
 import uuid
 
+import image_importer
+
 
 def write_log(logfile, message):
     print(message, file=logfile)
 
 
 def run_process_with_log(exe, logfile):
-
+    print(" ".join(exe))
     p = subprocess.Popen(exe,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT)
+    log_fp = open(logfile, "a+")
     while(True):
         retcode = p.poll()
         line = p.stdout.readline()
         if line:
-            write_log(line)
+            write_log(log_fp, line)
         if retcode is not None:
+            log_fp.flush()
+            log_fp.close()
             return retcode
 
 
@@ -32,6 +37,7 @@ class HadoopJob(object):
     failed = False
     err_msg = ""
     job_thread = None
+    _picdir = "./data/pics"
 
     def start(self, picdirs, logfile):
         self.picdirs = picdirs
@@ -44,31 +50,44 @@ class HadoopJob(object):
             picdirs = [picdirs]
         jsonfiles = []
         hadoop_store = "/user/" + str(uuid.uuid4())
-        cmd = "sudo su -c -l hadoop 'hadoop fs -mkdir %s'" % hadoop_store
+        mydir = os.path.dirname(os.path.realpath(__file__))
+        cmd = ["/usr/bin/hadoop", "fs", "-mkdir", hadoop_store]
         run_process_with_log(cmd, logfile)
         for picdir in picdirs:
             jsonfilename = str(uuid.uuid4()) + ".json"
-            input_dir = os.path.join(self._picdir, picdir)
+            input_dir = os.path.join(mydir, self._picdir, picdir)
             out_file = os.path.join("/tmp", jsonfilename)
             image_importer.transfer_pics(input_dir, out_file)
             jsonfiles.append(out_file)
             #upload to hadoop
-            cmd = "sudo su -c -l hadoop 'hadoop fs -copyFromLocal %s %s'" % (out_file, hadoop_store)
+            cmd = ["/usr/bin/hadoop", "fs", "-copyFromLocal", out_file, hadoop_store]
             ret = run_process_with_log(cmd, logfile)
             if ret != 0:
                 self.failed = True
-                self.err_msg = "Failed to execute command: " + cmd
+                self.err_msg = "Failed to execute command: " + " ".join(cmd)
                 self.running = False
                 return
         #submit mapreduce job
         hadoop_outdir = "/user/pa-" + str(uuid.uuid4())
-        mydir = os.path.dirname(os.path.realpath(__file__))
         mapper = os.path.join(mydir, "mapper.py")
         reducer = os.path.join(mydir, "reducer.py")
-        cmd = "sudo su -c -l hadoop 'hadoop jar /usr/share/hadoop/contrib/streaming/hadoop-streaming-1.2.1.jar -input %(store)s -output %(out)s -mapper mapper.py -reducer reducer.py -file %(mapper)s -file %(reducer)s'"
-        cmd = cmd % dict(store=hadoop_store, out=hadoop_outdir, mapper=mapper, reducer=reducer)
+        cmd = ["/usr/bin/hadoop",
+               "jar",
+               "/usr/share/hadoop/contrib/streaming/hadoop-streaming-1.2.1.jar",
+               "-input",
+               hadoop_store,
+               "-output",
+               hadoop_outdir,
+               "-mapper",
+               "mapper.py",
+               "-reducer",
+               reducer,
+               "-file",
+               mapper,
+               "-file",
+               reducer]
         ret = run_process_with_log(cmd, logfile)
         if ret != 0:
             self.failed = True
-            self.err_msg = "Failed to execute command: " + cmd
+            self.err_msg = "Failed to execute command: " + " ".join(cmd)
         self.running = False

@@ -7,7 +7,6 @@ import string
 import cherrypy
 import sys
 import uuid
-import image_importer
 import hadoop_job as hjob
 
 
