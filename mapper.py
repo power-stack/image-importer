@@ -64,16 +64,16 @@ for line in sys.stdin:
             except:
                 pass
 
-            if not edited:
-                resaved = filename + '.resaved.jpg'
-                im.save(resaved, 'JPEG', quality=95)
-                resaved_im = Image.open(resaved)
-                ela_im = ImageChops.difference(im, resaved_im)
-                extrema = ela_im.getextrema()
-                max_diff = max([ex[1] for ex in extrema])
-                img_dict['edited'] = 'notsure'
-                img_dict['ela'] = max_diff
-                if os.path.exists(resaved):
-                    os.remove(resaved)
+            #if not edited:
+            resaved = filename + '.resaved.jpg'
+            im.save(resaved, 'JPEG', quality=95)
+            resaved_im = Image.open(resaved)
+            ela_im = ImageChops.difference(im, resaved_im)
+            extrema = ela_im.getextrema()
+            max_diff = max([ex[1] for ex in extrema])
+            img_dict['edited'] = 'notsure'
+            img_dict['ela'] = max_diff
+            if os.path.exists(resaved):
+                os.remove(resaved)
 
             print json.dumps(img_dict)

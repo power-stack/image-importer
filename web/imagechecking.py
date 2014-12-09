@@ -53,6 +53,7 @@ class ResultReader(object):
                         results.append(json.loads(line))
                     except:
                         pass
+                results.sort(reverse=True)
                 for pic_res in results:
                     if not pic_res:
                         continue
@@ -65,8 +66,9 @@ class ResultReader(object):
                         continue
                     pic_name = pic_name[len(self._hjob.picdir):]
                     content += "<tr><td>" + pic_name + "</td>"
-                    if "yes" == edited:
-                        content += "<td style='background-color:red;'>" + edited + "</td>"
+                    #if "yes" == edited:
+                    if software:
+                        content += "<td style='background-color:red;'>" + "yes" + "</td>"
                     else:
                         content += "<td>" + edited + "</td>"
                     content += "<td>" + reason + "</td>"
